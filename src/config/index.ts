@@ -91,6 +91,22 @@ function loadFromEnv(): Partial<AppConfig> {
   config.yahooFinance = defaultConfig.yahooFinance;
   config.serverInfo = defaultConfig.serverInfo;
   config.capabilities = defaultConfig.capabilities;
+  config.security = {
+    enabled: parseEnvVar('SECURITY_ENABLED', defaultConfig.security.enabled),
+    enableInputValidation: parseEnvVar('SECURITY_ENABLE_INPUT_VALIDATION', defaultConfig.security.enableInputValidation),
+    enableOutputSanitization: parseEnvVar('SECURITY_ENABLE_OUTPUT_SANITIZATION', defaultConfig.security.enableOutputSanitization),
+    maxSymbolsPerRequest: parseEnvVar('SECURITY_MAX_SYMBOLS_PER_REQUEST', defaultConfig.security.maxSymbolsPerRequest),
+    maxStringLength: parseEnvVar('SECURITY_MAX_STRING_LENGTH', defaultConfig.security.maxStringLength),
+    allowedOrigins: parseEnvVar('SECURITY_ALLOWED_ORIGINS', defaultConfig.security.allowedOrigins),
+    enableRateLimiting: parseEnvVar('SECURITY_ENABLE_RATE_LIMITING', defaultConfig.security.enableRateLimiting),
+    enableRequestLogging: parseEnvVar('SECURITY_ENABLE_REQUEST_LOGGING', defaultConfig.security.enableRequestLogging),
+    sanitizeErrors: parseEnvVar('SECURITY_SANITIZE_ERRORS', defaultConfig.security.sanitizeErrors),
+    maxRequestsPerIP: parseEnvVar('SECURITY_MAX_REQUESTS_PER_IP', defaultConfig.security.maxRequestsPerIP),
+    rateLimitWindowMs: parseEnvVar('SECURITY_RATE_LIMIT_WINDOW_MS', defaultConfig.security.rateLimitWindowMs),
+    blockDurationMs: parseEnvVar('SECURITY_BLOCK_DURATION_MS', defaultConfig.security.blockDurationMs),
+    enableCSRFProtection: parseEnvVar('SECURITY_ENABLE_CSRF_PROTECTION', defaultConfig.security.enableCSRFProtection),
+    enableContentSecurityPolicy: parseEnvVar('SECURITY_ENABLE_CONTENT_SECURITY_POLICY', defaultConfig.security.enableContentSecurityPolicy)
+  };
 
   return config;
 }

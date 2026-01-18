@@ -140,6 +140,7 @@ export interface AppConfig {
   yahooFinance: YahooFinanceConfig;
   serverInfo: ServerInfoConfig;
   capabilities: CapabilitiesConfig;
+  security: SecurityConfig;
 }
 
 export const defaultRateLimitConfig: RateLimitConfig = {
@@ -221,6 +222,25 @@ export const defaultYahooFinanceConfig: YahooFinanceConfig = {
   strictMode: false
 };
 
+import type { SecurityConfig } from '../types/config.js';
+
+export const defaultSecurityConfig: SecurityConfig = {
+  enabled: true,
+  enableInputValidation: true,
+  enableOutputSanitization: true,
+  maxSymbolsPerRequest: 50,
+  maxStringLength: 1000,
+  allowedOrigins: [],
+  enableRateLimiting: true,
+  enableRequestLogging: true,
+  sanitizeErrors: true,
+  maxRequestsPerIP: 1000,
+  rateLimitWindowMs: 3600000,
+  blockDurationMs: 3600000,
+  enableCSRFProtection: true,
+  enableContentSecurityPolicy: true
+};
+
 export const defaultServerInfoConfig: ServerInfoConfig = {
   name: 'y-finance-mcp-server',
   version: '1.0.0',
@@ -244,5 +264,6 @@ export const defaultConfig: AppConfig = {
   network: defaultNetworkConfig,
   yahooFinance: defaultYahooFinanceConfig,
   serverInfo: defaultServerInfoConfig,
-  capabilities: defaultCapabilitiesConfig
+  capabilities: defaultCapabilitiesConfig,
+  security: defaultSecurityConfig
 };

@@ -175,6 +175,23 @@ export type YahooFinanceConfig = {
   strictMode: boolean;
 };
 
+export type SecurityConfig = {
+  enabled: boolean;
+  enableInputValidation: boolean;
+  enableOutputSanitization: boolean;
+  maxSymbolsPerRequest: number;
+  maxStringLength: number;
+  allowedOrigins: string[];
+  enableRateLimiting: boolean;
+  enableRequestLogging: boolean;
+  sanitizeErrors: boolean;
+  maxRequestsPerIP: number;
+  rateLimitWindowMs: number;
+  blockDurationMs: number;
+  enableCSRFProtection: boolean;
+  enableContentSecurityPolicy: boolean;
+};
+
 export type MCPServerConfig = {
   serverInfo: {
     name: string;
@@ -209,6 +226,7 @@ export type MCPServerConfig = {
   logging: LoggingConfig;
   network: NetworkConfig;
   yahooFinance: YahooFinanceConfig;
+  security: SecurityConfig;
   [key: string]: unknown;
 };
 

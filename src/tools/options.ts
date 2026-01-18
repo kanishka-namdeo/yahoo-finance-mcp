@@ -3,6 +3,7 @@ import { OptionsInputSchema, OptionsOutputSchema } from '../schemas/index.js';
 import { YahooFinanceError, YF_ERR_DATA_INCOMPLETE, YF_ERR_DATA_UNAVAILABLE } from '../types/errors.js';
 import { DataQualityReporter } from '../utils/data-completion.js';
 import type { OptionsResult, OptionsExpiration, PriceData } from '../types/yahoo-finance.js';
+import { InputValidator } from '../utils/security.js';
 
 const yahooFinance = new YahooFinance();
 const OPTIONS_CACHE_TTL = 3600000;
@@ -529,6 +530,20 @@ export async function getOptionsTool(
 ): Promise<Record<string, unknown>> {
   const parsed = OptionsInputSchema.parse(args);
   const { symbol, date, expiration, optionsType = 'both', includeGreeks = false } = parsed;
+
+  InputValidator.validateSymbol(symbol);
+
+  if (expiration) {
+    InputValidator.validateString(expiration, 'expiration');
+  }
+
+  if (date) {
+    InputValidator.validateDate(date, 'date');
+  }
+
+  if (optionsType) {
+    InputValidator.validateString(optionsType, 'optionsType');
+  }
 
   const cacheKey = optionsToolCache.generateCacheKey(symbol, expiration || date || null, includeGreeks);
   const fromCache = optionsToolCache.get(cacheKey) !== null;

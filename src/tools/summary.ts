@@ -4,6 +4,7 @@ import { YahooFinanceClient } from '../services/yahoo-finance.js';
 import { DataQualityReporter, type DataQualityReport } from '../utils/data-completion.js';
 import type { SummaryProfileResult, CryptoQuoteResult, ForexQuoteResult, TrendingResult, ScreenerResult } from '../types/yahoo-finance.js';
 import type { MCPServerConfig } from '../types/config.js';
+import { InputValidator } from '../utils/security.js';
 
 type SummaryToolMeta = {
   fromCache: boolean;
@@ -83,6 +84,8 @@ class SummaryTools {
     const parsed = SummaryProfileInputSchema.parse(input);
     const { symbol, includeBusinessSummary } = parsed;
 
+    InputValidator.validateSymbol(symbol);
+
     const startTime = Date.now();
 
     try {
@@ -139,6 +142,12 @@ class SummaryTools {
     const parsed = CryptoQuoteInputSchema.parse(input);
     const { symbols, currency } = parsed;
 
+    InputValidator.validateSymbols(symbols);
+
+    if (currency) {
+      InputValidator.validateString(currency, 'currency');
+    }
+
     const results: Record<string, CryptoQuoteResult> = {};
     const errors: Array<{ symbol: string; error: string }> = [];
     let fromCacheCount = 0;
@@ -176,6 +185,10 @@ class SummaryTools {
   async getForexQuote(input: unknown): Promise<{ results: Record<string, ForexQuoteResult>; summary: ForexSummary }> {
     const parsed = ForexQuoteInputSchema.parse(input);
     const { pairs } = parsed;
+
+    for (const pair of pairs) {
+      InputValidator.validateString(pair, 'forex_pair');
+    }
 
     const results: Record<string, ForexQuoteResult> = {};
     const errors: Array<{ pair: string; error: string }> = [];
@@ -215,6 +228,10 @@ class SummaryTools {
     const parsed = TrendingInputSchema.parse(input);
     const { region, limit } = parsed;
 
+    if (region) {
+      InputValidator.validateString(region, 'region');
+    }
+
     const startTime = Date.now();
     const cacheKey = `trending:${region || 'US'}`;
 
@@ -247,6 +264,16 @@ class SummaryTools {
   async screener(input: unknown): Promise<{ screened: ScreenerResult; meta: ScreenerMeta }> {
     const parsed = ScreenerInputSchema.parse(input);
     const { filters, limit, validateFilters } = parsed;
+
+    if (filters) {
+      for (const key in filters) {
+        InputValidator.validateString(key, 'filter_key');
+        const value = filters[key];
+        if (typeof value === 'string') {
+          InputValidator.validateString(value, `filter_${key}`);
+        }
+      }
+    }
 
     const startTime = Date.now();
     const warnings: string[] = [];

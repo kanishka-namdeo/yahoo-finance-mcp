@@ -3,6 +3,7 @@ import type { QuoteResult, PriceData } from '../types/yahoo-finance.js';
 import { YahooFinanceClient } from '../services/yahoo-finance.js';
 import { DataQualityReporter } from '../utils/data-completion.js';
 import { YahooFinanceError, YF_ERR_RATE_LIMIT } from '../types/errors.js';
+import { InputValidator } from '../utils/security.js';
 
 const BATCH_SIZE = 10;
 const DELAYED_DATA_THRESHOLD_MS = 15 * 60 * 1000;
@@ -120,6 +121,15 @@ export class QuoteTools {
 
   async getQuote(input: GetQuoteInput): Promise<GetQuoteOutput> {
     const { symbols, fields, forceRefresh = false, timeout } = input;
+    
+    InputValidator.validateSymbols(symbols);
+    
+    if (fields) {
+      for (const field of fields) {
+        InputValidator.validateString(field, 'field');
+      }
+    }
+    
     const results: Record<string, QuoteResultData> = {};
     const errors: Array<{ symbol: string; error: string }> = [];
     let fromCacheCount = 0;

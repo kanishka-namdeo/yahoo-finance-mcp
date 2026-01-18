@@ -3,6 +3,7 @@ import { NewsInputSchema, NewsOutputSchema } from '../schemas/index.js';
 import { YahooFinanceError, YF_ERR_DATA_INCOMPLETE, YF_ERR_DATA_UNAVAILABLE } from '../types/errors.js';
 import { DataQualityReporter } from '../utils/data-completion.js';
 import type { NewsItem, NewsResult } from '../types/yahoo-finance.js';
+import { InputValidator } from '../utils/security.js';
 
 const yahooFinance = new YahooFinance();
 const NEWS_CACHE_TTL = 300000;
@@ -262,6 +263,12 @@ export async function getCompanyNewsTool(
 ): Promise<Record<string, unknown>> {
   const parsed = NewsInputSchema.parse(args);
   const { symbol, limit = 10, startDate, requireRelatedTickers = false } = parsed;
+
+  InputValidator.validateSymbol(symbol);
+
+  if (startDate) {
+    InputValidator.validateDate(startDate, 'startDate');
+  }
 
   const cacheKey = newsToolCache.generateCacheKey(symbol, limit, requireRelatedTickers);
   const fromCache = newsToolCache.get(cacheKey) !== null;

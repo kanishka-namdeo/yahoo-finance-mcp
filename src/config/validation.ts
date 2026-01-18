@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { SecurityConfig } from '../types/config.js';
 
 export const RateLimitConfigSchema = z.object({
   requestsPerMinute: z.number().int().positive(),
@@ -107,6 +108,23 @@ export const YahooFinanceConfigSchema = z.object({
   strictMode: z.boolean()
 });
 
+export const SecurityConfigSchema = z.object({
+  enabled: z.boolean(),
+  enableInputValidation: z.boolean(),
+  enableOutputSanitization: z.boolean(),
+  maxSymbolsPerRequest: z.number().int().positive(),
+  maxStringLength: z.number().int().positive(),
+  allowedOrigins: z.array(z.string().url()),
+  enableRateLimiting: z.boolean(),
+  enableRequestLogging: z.boolean(),
+  sanitizeErrors: z.boolean(),
+  maxRequestsPerIP: z.number().int().positive(),
+  rateLimitWindowMs: z.number().int().positive(),
+  blockDurationMs: z.number().int().positive(),
+  enableCSRFProtection: z.boolean(),
+  enableContentSecurityPolicy: z.boolean()
+});
+
 export const ServerInfoConfigSchema = z.object({
   name: z.string(),
   version: z.string(),
@@ -140,5 +158,6 @@ export const AppConfigSchema = z.object({
   network: NetworkConfigSchema,
   yahooFinance: YahooFinanceConfigSchema,
   serverInfo: ServerInfoConfigSchema,
-  capabilities: CapabilitiesConfigSchema
+  capabilities: CapabilitiesConfigSchema,
+  security: SecurityConfigSchema
 });

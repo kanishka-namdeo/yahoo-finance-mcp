@@ -3,6 +3,7 @@ import { HoldersInputSchema, HoldersOutputSchema } from '../schemas/index.js';
 import { YahooFinanceError, YF_ERR_DATA_INCOMPLETE, YF_ERR_DATA_UNAVAILABLE } from '../types/errors.js';
 import { DataQualityReporter } from '../utils/data-completion.js';
 import type { Holder, InstitutionalHolder, FundHolder, InsiderHolder, HolderResult } from '../types/yahoo-finance.js';
+import { InputValidator } from '../utils/security.js';
 
 const yahooFinance = new YahooFinance();
 const HOLDERS_CACHE_TTL = 3600000;
@@ -452,6 +453,8 @@ export async function getMajorHoldersTool(
 ): Promise<Record<string, unknown>> {
   const parsed = HoldersInputSchema.parse(args);
   const { symbol, includeChangeHistory = false } = parsed;
+
+  InputValidator.validateSymbol(symbol);
 
   const fromCache = holdersToolCache.get(holdersToolCache.generateCacheKey(symbol, includeChangeHistory)) !== null;
   const startTime = Date.now();

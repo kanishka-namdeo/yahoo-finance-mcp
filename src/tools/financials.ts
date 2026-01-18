@@ -4,6 +4,7 @@ import { YahooFinanceError, YF_ERR_DATA_INCOMPLETE } from '../types/errors.js';
 import { DataQualityReporter } from '../utils/data-completion.js';
 import type { FinancialStatementResult, BalanceSheet, IncomeStatement, CashFlowStatement } from '../types/yahoo-finance.js';
 import type { CacheConfig } from '../types/config.js';
+import { InputValidator } from '../utils/security.js';
 
 type FinancialsToolConfig = {
   cache: CacheConfig;
@@ -598,6 +599,12 @@ export async function getIncomeStatementTool(
   const parsed = FinancialsInputSchema.parse(args);
   const { symbol, frequency = 'annual', limit = DEFAULT_LIMIT } = parsed;
 
+  InputValidator.validateSymbol(symbol);
+
+  if (frequency) {
+    InputValidator.validateString(frequency, 'frequency');
+  }
+
   const result = await getIncomeStatement(symbol, frequency, limit, financialsToolCache);
 
   const statements = result.statements.map((stmt) => ({
@@ -624,6 +631,12 @@ export async function getCashFlowStatementTool(
 ): Promise<Record<string, unknown>> {
   const parsed = FinancialsInputSchema.parse(args);
   const { symbol, frequency = 'annual', limit = DEFAULT_LIMIT } = parsed;
+
+  InputValidator.validateSymbol(symbol);
+
+  if (frequency) {
+    InputValidator.validateString(frequency, 'frequency');
+  }
 
   const result = await getCashFlowStatement(symbol, frequency, limit, financialsToolCache);
 

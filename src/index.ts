@@ -13,7 +13,9 @@ import { YahooFinanceClient } from './services/yahoo-finance.js';
 import { RateLimiter } from './middleware/rate-limiter.js';
 import { CircuitBreaker } from './middleware/circuit-breaker.js';
 import { Cache } from './middleware/cache.js';
+import { SecurityMiddleware } from './middleware/security.js';
 import { DataQualityReporter } from './utils/data-completion.js';
+import { InputValidator } from './utils/security.js';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 
@@ -54,6 +56,7 @@ class MCPServer {
   private circuitBreaker!: CircuitBreaker;
   private cache!: Cache;
   private qualityReporter!: DataQualityReporter;
+  private securityMiddleware!: SecurityMiddleware;
   private state: ServerState;
   private metrics: Metrics;
   private toolHandlers: Map<string, (args: unknown) => Promise<unknown>>;
@@ -123,6 +126,8 @@ class MCPServer {
 
     this.qualityReporter = new DataQualityReporter(this.config.cache.ttlQuotes);
 
+    this.securityMiddleware = new SecurityMiddleware(this.config.security);
+
     this.yahooClient = new YahooFinanceClient({
       rateLimit: {
         strategy: 'token-bucket',
@@ -177,6 +182,7 @@ class MCPServer {
       yahooFinance: this.config.yahooFinance,
       serverInfo: this.config.serverInfo,
       capabilities: this.config.capabilities,
+      security: this.config.security,
       transport: 'stdio'
     });
 
@@ -260,6 +266,7 @@ class MCPServer {
       yahooFinance: this.config.yahooFinance,
       serverInfo: this.config.serverInfo,
       capabilities: this.config.capabilities,
+      security: this.config.security,
       transport: 'stdio'
     });
 
@@ -557,17 +564,21 @@ class MCPServer {
       this.metrics.requestCount++;
 
       try {
+        await this.securityMiddleware.validateInput(args, `tool:${name}`);
+
         const handler = this.toolHandlers.get(name);
         if (!handler) {
           throw new Error(`Unknown tool: ${name}`);
         }
 
         const result = await handler(args);
+        const sanitizedResult = await this.securityMiddleware.sanitizeOutput(result);
+
         this.metrics.successCount++;
-        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+        return { content: [{ type: 'text', text: JSON.stringify(sanitizedResult, null, 2) }] };
       } catch (error) {
         this.metrics.errorCount++;
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = this.securityMiddleware.sanitizeError(error);
         return {
           content: [{ type: 'text', text: JSON.stringify({ error: errorMessage }, null, 2) }],
           isError: true
@@ -604,34 +615,46 @@ class MCPServer {
         throw new Error(`Server is not ready. Current state: ${this.state}`);
       }
 
-      const match = uri.match(/^ticker:\/\/([^/]+)\/(.+)$/);
-      if (!match) {
-        throw new Error(`Invalid resource URI: ${uri}`);
-      }
+      try {
+        await this.securityMiddleware.validateInput(uri, 'resource:uri');
 
-      const [, symbol, resourceType] = match;
+        const match = uri.match(/^ticker:\/\/([^/]+)\/(.+)$/);
+        if (!match) {
+          throw new Error(`Invalid resource URI: ${uri}`);
+        }
 
-      switch (resourceType) {
-        case 'quote':
-          const quoteResult = await this.yahooClient.getQuote(symbol);
-          return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(quoteResult) }] };
-        case 'profile':
-          const profileResult = await this.yahooClient.getSummaryProfile(symbol);
-          return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(profileResult) }] };
-        case 'financials':
-          const financialsResult = await this.yahooClient.getFinancials(symbol, 'income-statement');
-          return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(financialsResult) }] };
-        case 'historical':
-          const historicalResult = await this.yahooClient.getHistoricalPrices(symbol);
-          return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(historicalResult) }] };
-        case 'news':
-          const newsResult = await this.yahooClient.getNews(symbol);
-          return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(newsResult) }] };
-        case 'analysis':
-          const analysisResult = await this.yahooClient.getAnalysis(symbol);
-          return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(analysisResult) }] };
-        default:
-          throw new Error(`Unknown resource type: ${resourceType}`);
+        const [, symbol, resourceType] = match;
+        InputValidator.validateSymbol(symbol);
+
+        let result;
+        switch (resourceType) {
+          case 'quote':
+            result = await this.yahooClient.getQuote(symbol);
+            break;
+          case 'profile':
+            result = await this.yahooClient.getSummaryProfile(symbol);
+            break;
+          case 'financials':
+            result = await this.yahooClient.getFinancials(symbol, 'income-statement');
+            break;
+          case 'historical':
+            result = await this.yahooClient.getHistoricalPrices(symbol);
+            break;
+          case 'news':
+            result = await this.yahooClient.getNews(symbol);
+            break;
+          case 'analysis':
+            result = await this.yahooClient.getAnalysis(symbol);
+            break;
+          default:
+            throw new Error(`Unknown resource type: ${resourceType}`);
+        }
+
+        const sanitizedResult = await this.securityMiddleware.sanitizeOutput(result);
+        return { contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(sanitizedResult) }] };
+      } catch (error) {
+        const errorMessage = this.securityMiddleware.sanitizeError(error);
+        throw new Error(errorMessage);
       }
     });
   }

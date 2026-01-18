@@ -4,6 +4,7 @@ import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprot
 import type { HistoricalPriceResult, HistoricalPriceData } from '../types/yahoo-finance.js';
 import { YahooFinanceClient } from '../services/yahoo-finance.js';
 import { DataQualityReporter } from '../utils/data-completion.js';
+import { InputValidator } from '../utils/security.js';
 
 type HistoricalPriceWithFlags = {
   date: string;

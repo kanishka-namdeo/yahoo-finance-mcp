@@ -4,6 +4,7 @@ import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprot
 import type { EarningsResult, EarningsChart, EarningsTrend } from '../types/yahoo-finance.js';
 import { YahooFinanceClient } from '../services/yahoo-finance.js';
 import { DataQualityReporter } from '../utils/data-completion.js';
+import { InputValidator } from '../utils/security.js';
 
 const EARNINGS_CACHE_TTL_MS = 3600000;
 
@@ -98,6 +99,8 @@ export class EarningsTools {
     }).parse(args);
 
     const { symbol, limit, includeEstimates } = input;
+
+    InputValidator.validateSymbol(symbol);
     const cacheKey = `earnings:${symbol}:${limit}:${includeEstimates}`;
     const now = Date.now();
 

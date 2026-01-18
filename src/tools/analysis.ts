@@ -4,6 +4,7 @@ import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprot
 import type { AnalysisResult, AnalystRecommendation, EarningsTrend } from '../types/yahoo-finance.js';
 import { YahooFinanceClient } from '../services/yahoo-finance.js';
 import { DataQualityReporter } from '../utils/data-completion.js';
+import { InputValidator } from '../utils/security.js';
 
 const ANALYSIS_CACHE_TTL_MS = 3600000;
 
@@ -107,6 +108,8 @@ export class AnalysisTools {
     }).parse(args);
 
     const { symbol, includeExpired } = input;
+
+    InputValidator.validateSymbol(symbol);
     const cacheKey = `analysis:${symbol}:${includeExpired}`;
     const now = Date.now();
 
