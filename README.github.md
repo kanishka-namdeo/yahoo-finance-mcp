@@ -34,8 +34,8 @@ npm install -g yfnhanced-mcp
 
 ```bash
 # Clone and install
-git clone https://github.com/your-repo/yahoo-finance-mcp.git
-cd yahoo-finance-mcp
+git clone https://github.com/kanishka-namdeo/yfnhanced-mcp.git
+cd yfnhanced-mcp
 npm install
 
 # Build TypeScript
@@ -71,10 +71,10 @@ Or if running from source:
 ```json
 {
   "mcpServers": {
-    "yahoo-finance": {
+    "yfnhanced": {
       "command": "node",
-      "args": ["absolute:\\path\\to\\yahoo-finance-mcp\\dist\\index.js"],
-      "cwd": "absolute:\\path\\to\\yahoo-finance-mcp"
+      "args": ["absolute:\\path\\to\\yfnhanced-mcp\\dist\\index.js"],
+      "cwd": "absolute:\\path\\to\\yfnhanced-mcp"
     }
   }
 }

@@ -114,7 +114,7 @@ Create a `config.json` file:
 }
 ```
 
-For detailed configuration options, see the [Configuration Guide](https://github.com/your-username/y-finance-mcp/blob/main/docs/CONFIGURATION.md).
+For detailed configuration options, see [Configuration Guide](https://github.com/kanishka-namdeo/yfnhanced-mcp/blob/main/docs/CONFIGURATION.md).
 
 ## Performance
 

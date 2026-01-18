@@ -45,10 +45,10 @@ Add to `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "yahoo-finance": {
+    "yfnhanced": {
       "command": "node",
-      "args": ["D:\\path\\to\\yahoo-finance-mcp\\dist\\index.js"],
-      "cwd": "D:\\path\\to\\yahoo-finance-mcp"
+      "args": ["D:\\path\\to\\yfnhanced-mcp\\dist\\index.js"],
+      "cwd": "D:\\path\\to\\yfnhanced-mcp"
     }
   }
 }
