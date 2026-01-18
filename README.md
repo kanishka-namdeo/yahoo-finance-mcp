@@ -73,8 +73,8 @@ Or if running from source:
   "mcpServers": {
     "yahoo-finance": {
       "command": "node",
-      "args": ["D:\\path\\to\\yahoo-finance-mcp\\dist\\index.js"],
-      "cwd": "D:\\path\\to\\yahoo-finance-mcp"
+      "args": ["absolute:\\path\\to\\yahoo-finance-mcp\\dist\\index.js"],
+      "cwd": "absolute:\\path\\to\\yahoo-finance-mcp"
     }
   }
 }
