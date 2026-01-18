@@ -29,6 +29,7 @@ export class RequestDelayer {
   private rejectFn: ((error: Error) => void) | null;
 
   constructor(delay?: number | Partial<RequestDelayerConfig>) {
+    this.adaptive = false;
     if (typeof delay === 'number') {
       this.minDelay = delay;
       this.maxDelay = delay * 30;
@@ -42,7 +43,6 @@ export class RequestDelayer {
       this.minDelay = 1000;
       this.maxDelay = 30000;
       this.currentDelay = 1000;
-      this.adaptive = false;
     }
     this.delayCount = 0;
     this.totalDelay = 0;
@@ -233,9 +233,9 @@ export class DelayStrategy {
         } else {
           const successRate = this.getSuccessRate();
           if (successRate > 0.9) {
-            delay = Math.max(this.config.minDelay, this.config.baseDelay * 0.8);
+            delay = Math.max(this.config.minDelay!, this.config.baseDelay * 0.8);
           } else if (successRate < 0.5) {
-            delay = Math.min(this.config.maxDelay, this.config.baseDelay * 1.5);
+            delay = Math.min(this.config.maxDelay!, this.config.baseDelay * 1.5);
           } else {
             delay = this.config.baseDelay;
           }

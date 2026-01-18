@@ -7,6 +7,8 @@ export type RateLimitConfig = {
   maxRequests: number;
   windowMs: number;
   tokenRefillRate?: number;
+  requestsPerMinute?: number;
+  requestsPerHour?: number;
   skipFailedRequests?: boolean;
   skipSuccessfulRequests?: boolean;
   keyGenerator?: (request: unknown) => string;

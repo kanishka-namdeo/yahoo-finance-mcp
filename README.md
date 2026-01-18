@@ -24,6 +24,14 @@ Transforms unreliable financial APIs into dependable data sources with enterpris
 
 ### Installation
 
+**Via npm (Recommended):**
+
+```bash
+npm install -g yfnhanced-mcp
+```
+
+**From source:**
+
 ```bash
 # Clone and install
 git clone https://github.com/your-repo/yahoo-finance-mcp.git
@@ -37,12 +45,28 @@ npm run build
 ### Start Server
 
 ```bash
+# If installed globally via npm
+yfnhanced-mcp
+
+# Or if running from source
 npm start
 ```
 
 ### Claude Desktop Integration
 
 Add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "yfnhanced": {
+      "command": "yfnhanced-mcp"
+    }
+  }
+}
+```
+
+Or if running from source:
 
 ```json
 {

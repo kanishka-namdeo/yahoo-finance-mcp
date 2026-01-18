@@ -1,12 +1,18 @@
 {
-  "name": "y-finance-mcp",
+  "name": "yfnhanced-mcp",
   "version": "1.0.0",
-  "description": "Yahoo Finance MCP Server - A Model Context Protocol server for financial data",
+  "description": "Yahoo Finance MCP Server - A Model Context Protocol server for financial data with enterprise-grade resilience, circuit breaker, rate limiting, and data quality validation",
   "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
     "y-finance-mcp": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
@@ -17,16 +23,32 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "start": "node dist/index.js",
-    "clean": "rm -rf dist"
+    "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('dist')) { fs.rmSync('dist', { recursive: true, force: true }); }\"",
+    "prepublishOnly": "npm run clean && npm run build",
+    "prepack": "npm run build"
   },
   "keywords": [
     "mcp",
     "model-context-protocol",
     "yahoo-finance",
     "finance",
-    "stocks"
+    "stocks",
+    "financial-data",
+    "circuit-breaker",
+    "rate-limiting",
+    "api-resilience",
+    "data-quality"
   ],
+  "author": "Your Name <your.email@example.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/y-finance-mcp.git"
+  },
+  "homepage": "https://github.com/your-username/y-finance-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/your-username/y-finance-mcp/issues"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.2",
     "yahoo-finance2": "^3.11.2",
