@@ -1,22 +1,29 @@
 # Dependencies
 node_modules/
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+jspm_packages/
+
+# Package manager locks (choose which one to keep based on your package manager)
+# package-lock.json  # Uncomment if using npm
+# yarn.lock          # Uncomment if using yarn
+# pnpm-lock.yaml     # Uncomment if using pnpm
 
 # Build output
 dist/
 build/
+out/
 *.tsbuildinfo
 
 # Test coverage
 coverage/
 .nyc_output/
+*.lcov
 
 # Environment variables
 .env
 .env.local
-.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
 *.env
 
 # IDE
@@ -26,6 +33,8 @@ coverage/
 *.swo
 *~
 .DS_Store
+*.sublime-project
+*.sublime-workspace
 
 # Logs
 logs/
@@ -35,17 +44,18 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 pino-debug.log*
+pnpm-debug.log*
 
 # Temporary files
 tmp/
 temp/
 *.tmp
 .cache/
+.parcel-cache/
+.vite/
 
-# Docker
-.dockerignore
-
-# Misc
+# Runtime data
+pids
 *.pid
 *.seed
 *.pid.lock
@@ -53,6 +63,24 @@ temp/
 # OS
 Thumbs.db
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# TypeScript
+*.tsbuildinfo
+
+# MCP/Node.js specific
+.eslintcache
 
 # Testing
 *.test.ts.snap
+.vitest/
+
+# Misc
+*.bak
+*.backup
+.turbo/
