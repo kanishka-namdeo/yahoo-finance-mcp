@@ -12,6 +12,10 @@ This document explains all configuration options available for the Yahoo Finance
 - [Queue Configuration](#queue-configuration)
 - [Data Completion](#data-completion)
 - [Server Configuration](#server-configuration)
+- [Logging Configuration](#logging-configuration)
+- [MCP Server Information](#mcp-server-information)
+- [MCP Capabilities](#mcp-capabilities)
+- [Security Configuration](#security-configuration)
 - [Fallback Configuration](#fallback-configuration)
 - [Yahoo Finance Configuration](#yahoo-finance-configuration)
 - [Network Configuration](#network-configuration)
@@ -479,6 +483,247 @@ Server settings control how the MCP server runs and communicates.
 }
 ```
 
+## Logging Configuration
+
+Logging settings control how the server logs messages and events.
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `level` | string | 'info' | Logging level: 'debug', 'info', 'warn', 'error' |
+| `format` | string | 'json' | Log format: 'json' or 'text' |
+| `destination` | string | 'console' | Log destination: 'console', 'file', or 'both' |
+| `filePath` | string | './logs/mcp-server.log' | Path to log file |
+| `maxSize` | number | 10485760 | Maximum log file size in bytes |
+| `maxFiles` | number | 5 | Maximum number of log files to keep |
+
+### Logging Levels
+
+- **debug**: Detailed diagnostic information for troubleshooting
+- **info**: General informational messages (recommended for production)
+- **warn**: Warning messages for potential issues
+- **error**: Error messages only
+
+### Log Formats
+
+- **json**: Structured JSON logs (recommended for production and log aggregation)
+- **text**: Human-readable plain text logs (recommended for development)
+
+### Recommended Values
+
+**Development:**
+```json
+{
+  "logging": {
+    "level": "debug",
+    "format": "text",
+    "destination": "console"
+  }
+}
+```
+
+**Production:**
+```json
+{
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "destination": "both",
+    "filePath": "./logs/mcp-server.log",
+    "maxSize": 10485760,
+    "maxFiles": 5
+  }
+}
+```
+
+**Minimal:**
+```json
+{
+  "logging": {
+    "level": "error",
+    "format": "json",
+    "destination": "file",
+    "filePath": "./logs/errors.log",
+    "maxSize": 5242880,
+    "maxFiles": 3
+  }
+}
+```
+
+## MCP Server Information
+
+Server information defines the identity and versioning of the MCP server.
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `name` | string | 'y-finance-mcp-server' | Server name identifier |
+| `version` | string | '1.0.0' | Server version (semantic versioning) |
+| `protocolVersion` | string | '1.0' | MCP protocol version supported |
+
+### Recommended Values
+
+```json
+{
+  "serverInfo": {
+    "name": "y-finance-mcp-server",
+    "version": "1.0.0",
+    "protocolVersion": "1.0"
+  }
+}
+```
+
+## MCP Capabilities
+
+Define the capabilities that the MCP server advertises to clients.
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `tools.listChanged` | boolean | false | Whether tool list can change dynamically |
+| `resources.subscribe` | boolean | false | Whether resources support subscriptions |
+| `resources.listChanged` | boolean | false | Whether resource list can change dynamically |
+| `prompts.listChanged` | boolean | false | Whether prompt list can change dynamically |
+| `logging.level` | string | 'info' | Server logging level for capabilities |
+
+### Recommended Values
+
+**Standard:**
+```json
+{
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    },
+    "logging": {
+      "level": "info"
+    }
+  }
+}
+```
+
+**Dynamic Tools:**
+```json
+{
+  "capabilities": {
+    "tools": {
+      "listChanged": true
+    },
+    "resources": {
+      "subscribe": true,
+      "listChanged": true
+    },
+    "prompts": {
+      "listChanged": false
+    },
+    "logging": {
+      "level": "debug"
+    }
+  }
+}
+```
+
+## Security Configuration
+
+Security settings control input validation, rate limiting, and protection mechanisms.
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enabled` | boolean | true | Enable security features globally |
+| `enableInputValidation` | boolean | true | Validate all input parameters |
+| `enableOutputSanitization` | boolean | true | Sanitize output data |
+| `maxSymbolsPerRequest` | number | 50 | Maximum symbols per request |
+| `maxStringLength` | number | 1000 | Maximum string length for inputs |
+| `allowedOrigins` | array | [] | Allowed CORS origins |
+| `enableRateLimiting` | boolean | true | Enable IP-based rate limiting |
+| `enableRequestLogging` | boolean | true | Log all requests for audit |
+| `sanitizeErrors` | boolean | true | Sanitize error messages |
+| `maxRequestsPerIP` | number | 1000 | Max requests per IP per window |
+| `rateLimitWindowMs` | number | 3600000 | Rate limit time window (ms) |
+| `blockDurationMs` | number | 3600000 | IP block duration (ms) |
+| `enableCSRFProtection` | boolean | true | Enable CSRF protection |
+| `enableContentSecurityPolicy` | boolean | true | Enable CSP headers |
+
+### Recommended Values
+
+**Development:**
+```json
+{
+  "security": {
+    "enabled": true,
+    "enableInputValidation": true,
+    "enableOutputSanitization": false,
+    "maxSymbolsPerRequest": 50,
+    "maxStringLength": 1000,
+    "allowedOrigins": [],
+    "enableRateLimiting": false,
+    "enableRequestLogging": true,
+    "sanitizeErrors": false,
+    "maxRequestsPerIP": 1000,
+    "rateLimitWindowMs": 3600000,
+    "blockDurationMs": 3600000,
+    "enableCSRFProtection": false,
+    "enableContentSecurityPolicy": false
+  }
+}
+```
+
+**Production:**
+```json
+{
+  "security": {
+    "enabled": true,
+    "enableInputValidation": true,
+    "enableOutputSanitization": true,
+    "maxSymbolsPerRequest": 50,
+    "maxStringLength": 1000,
+    "allowedOrigins": ["https://yourdomain.com"],
+    "enableRateLimiting": true,
+    "enableRequestLogging": true,
+    "sanitizeErrors": true,
+    "maxRequestsPerIP": 1000,
+    "rateLimitWindowMs": 3600000,
+    "blockDurationMs": 3600000,
+    "enableCSRFProtection": true,
+    "enableContentSecurityPolicy": true
+  }
+}
+```
+
+**Strict Security:**
+```json
+{
+  "security": {
+    "enabled": true,
+    "enableInputValidation": true,
+    "enableOutputSanitization": true,
+    "maxSymbolsPerRequest": 10,
+    "maxStringLength": 500,
+    "allowedOrigins": ["https://yourdomain.com"],
+    "enableRateLimiting": true,
+    "enableRequestLogging": true,
+    "sanitizeErrors": true,
+    "maxRequestsPerIP": 100,
+    "rateLimitWindowMs": 60000,
+    "blockDurationMs": 3600000,
+    "enableCSRFProtection": true,
+    "enableContentSecurityPolicy": true
+  }
+}
+```
+
 ## Fallback Configuration
 
 Global fallback settings for handling failures.
@@ -760,6 +1005,47 @@ For production with optimal performance and reliability:
     "enableMetrics": true,
     "metricsPort": 9090
   },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "destination": "console"
+  },
+  "serverInfo": {
+    "name": "y-finance-mcp-server",
+    "version": "1.0.0",
+    "protocolVersion": "1.0"
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    },
+    "resources": {
+      "subscribe": false,
+      "listChanged": false
+    },
+    "prompts": {
+      "listChanged": false
+    },
+    "logging": {
+      "level": "info"
+    }
+  },
+  "security": {
+    "enabled": true,
+    "enableInputValidation": true,
+    "enableOutputSanitization": true,
+    "maxSymbolsPerRequest": 50,
+    "maxStringLength": 1000,
+    "allowedOrigins": [],
+    "enableRateLimiting": true,
+    "enableRequestLogging": true,
+    "sanitizeErrors": true,
+    "maxRequestsPerIP": 1000,
+    "rateLimitWindowMs": 3600000,
+    "blockDurationMs": 3600000,
+    "enableCSRFProtection": true,
+    "enableContentSecurityPolicy": true
+  },
   "fallback": {
     "enabled": true,
     "delay": 5000
@@ -850,6 +1136,43 @@ server:
   logLevel: info
   enableMetrics: true
   metricsPort: 9090
+
+logging:
+  level: info
+  format: json
+  destination: console
+
+serverInfo:
+  name: y-finance-mcp-server
+  version: 1.0.0
+  protocolVersion: 1.0
+
+capabilities:
+  tools:
+    listChanged: false
+  resources:
+    subscribe: false
+    listChanged: false
+  prompts:
+    listChanged: false
+  logging:
+    level: info
+
+security:
+  enabled: true
+  enableInputValidation: true
+  enableOutputSanitization: true
+  maxSymbolsPerRequest: 50
+  maxStringLength: 1000
+  allowedOrigins: []
+  enableRateLimiting: true
+  enableRequestLogging: true
+  sanitizeErrors: true
+  maxRequestsPerIP: 1000
+  rateLimitWindowMs: 3600000
+  blockDurationMs: 3600000
+  enableCSRFProtection: true
+  enableContentSecurityPolicy: true
 
 fallback:
   enabled: true

@@ -126,6 +126,8 @@ Fetch real-time stock quotes with data quality reporting and caching.
 }
 ```
 
+Note: `dataAge` is in milliseconds.
+
 #### `get_quote_summary`
 
 Get comprehensive quote summary with data quality analysis and fallback strategies.
@@ -145,23 +147,43 @@ Get comprehensive quote summary with data quality analysis and fallback strategi
 
 ### Historical Data
 
-#### `get_historical`
+#### `get_historical_prices`
 
 Fetch historical price data with customizable date ranges and intervals.
 
 **Parameters:**
 - `symbol` (required): Stock symbol
-- `period` (optional): Time period (`1d`, `5d`, `1mo`, `3mo`, `6mo`, `1y`, `2y`, `5y`, `max`)
+- `startDate` (required): Start date in YYYY-MM-DD format
+- `endDate` (optional): End date in YYYY-MM-DD format
 - `interval` (optional): Data interval (`1m`, `2m`, `5m`, `15m`, `30m`, `60m`, `90m`, `1h`, `1d`, `5d`, `1wk`, `1mo`, `3mo`)
-- `startDate` (optional): Start date (YYYY-MM-DD)
-- `endDate` (optional): End date (YYYY-MM-DD)
-- `includePrePost` (optional): Include pre/post market data
+- `validateData` (optional): Validate data integrity (default: `true`)
 
 **Example:**
 ```json
 {
   "symbol": "AAPL",
-  "period": "1y",
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31",
+  "interval": "1d",
+  "validateData": true
+}
+```
+
+#### `get_historical_prices_multi`
+
+Fetch historical price data for multiple stock symbols with batch processing.
+
+**Parameters:**
+- `symbols` (required): Array of stock symbols (1-50 symbols)
+- `startDate` (required): Start date in YYYY-MM-DD format
+- `endDate` (optional): End date in YYYY-MM-DD format
+- `interval` (optional): Data interval (`1m`, `2m`, `5m`, `15m`, `30m`, `60m`, `90m`, `1h`, `1d`, `5d`, `1wk`, `1mo`, `3mo`)
+
+**Example:**
+```json
+{
+  "symbols": ["AAPL", "MSFT", "GOOGL"],
+  "startDate": "2024-01-01",
   "interval": "1d"
 }
 ```
@@ -324,15 +346,17 @@ Retrieve major holders information including institutional ownership, fund holde
 
 #### `get_summary_profile`
 
-Get comprehensive company summary with financial metrics, business summary, and key statistics.
+Get company profile information including sector, industry, and business summary. Handles missing sector data with fallback classification.
 
 **Parameters:**
-- `symbol` (required): Stock symbol
+- `symbol` (required): Stock ticker symbol (e.g., AAPL, MSFT)
+- `includeBusinessSummary` (optional): Include business summary in response (default: `true`)
 
 **Example:**
 ```json
 {
-  "symbol": "AAPL"
+  "symbol": "AAPL",
+  "includeBusinessSummary": true
 }
 ```
 
@@ -340,29 +364,31 @@ Get comprehensive company summary with financial metrics, business summary, and 
 
 #### `get_crypto_quote`
 
-Fetch cryptocurrency quotes.
+Fetch cryptocurrency quotes with exchange information.
 
 **Parameters:**
-- `symbols` (optional): Array of crypto symbols (e.g., `["BTC-USD", "ETH-USD"]`)
+- `symbols` (required): Array of cryptocurrency symbols (e.g., `["BTC-USD", "ETH-USD"]`)
+- `currency` (optional): Target currency for quotes (default: USD)
 
 **Example:**
 ```json
 {
-  "symbols": ["BTC-USD", "ETH-USD", "SOL-USD"]
+  "symbols": ["BTC-USD", "ETH-USD", "SOL-USD"],
+  "currency": "USD"
 }
 ```
 
 #### `get_forex_quote`
 
-Fetch foreign exchange rates.
+Fetch currency pair exchange rates with bid/ask spreads.
 
 **Parameters:**
-- `pairs` (optional): Array of forex pairs (e.g., `["EUR-USD", "GBP-USD"]`)
+- `pairs` (required): Array of forex pairs (e.g., `["EURUSD", "GBPUSD"]`)
 
 **Example:**
 ```json
 {
-  "pairs": ["EUR-USD", "GBP-USD", "JPY-USD"]
+  "pairs": ["EURUSD", "GBPUSD", "JPYUSD"]
 }
 ```
 
@@ -370,36 +396,43 @@ Fetch foreign exchange rates.
 
 #### `get_trending_symbols`
 
-Get trending stocks and cryptocurrency data.
+Get trending stocks with volume indicators and engagement metrics.
 
 **Parameters:**
-- `region` (optional): Market region (e.g., `"US"`, `"EU"`, `"ASIA"`)
-- `count` (optional): Number of trending items
+- `region` (optional): Region code (e.g., `"US"`, `"GB"`, `"DE"`, default: `"US"`)
+- `limit` (optional): Maximum number of trending symbols to return (1-50)
+- `includeVolume` (optional): Include volume data in results (default: `false`)
 
 **Example:**
 ```json
 {
   "region": "US",
-  "count": 10
+  "limit": 10,
+  "includeVolume": true
 }
 ```
 
 #### `screener`
 
-Stock screener for filtering stocks based on criteria.
+Stock screener for filtering stocks based on criteria with validation and confidence scores.
 
 **Parameters:**
-- `region` (optional): Region filter
-- `sector` (optional): Sector filter
-- `marketCap` (optional): Market cap range filter
-- `dividendYield` (optional): Dividend yield filter
-- `peRatio` (optional): P/E ratio filter
+- `filters` (required): Filter criteria object (e.g., `{ "marketCap": 1000000000, "sector": "Technology" }`)
+- `limit` (optional): Maximum number of results to return (1-250)
+- `validateFilters` (optional): Validate filters before execution (default: `true`)
+
+**Supported filter fields:** `marketCap`, `sector`, `industry`, `region`, `country`, `price`, `changePercent`, `volume`, `peRatio`, `dividendYield`, `beta`, `eps`, `profitMargin`, `revenueGrowth`, `debtToEquity`
 
 **Example:**
 ```json
 {
-  "sector": "Technology",
-  "marketCap": { "min": 10000000000 }
+  "filters": {
+    "sector": "Technology",
+    "marketCap": 10000000000,
+    "peRatio": 30
+  },
+  "limit": 25,
+  "validateFilters": true
 }
 ```
 
@@ -672,9 +705,39 @@ All responses include metadata:
 ```
 
 - `fromCache`: Whether data came from cache
-- `dataAge`: Age of data in seconds
+- `dataAge`: Age of data in milliseconds
 - `completenessScore`: Data completeness (0-100)
 - `warnings`: Array of quality warnings
+
+### Historical Data Quality
+
+Historical price responses include additional integrity flags:
+```json
+{
+  "meta": {
+    "fromCache": false,
+    "dataAge": 0,
+    "completenessScore": 95,
+    "warnings": [],
+    "integrityFlags": ["gap_detected", "split_detected", "null_values"]
+  }
+}
+```
+
+Historical data points include flags:
+- `isGap`: Indicates a gap in trading days
+- `isSplit`: Indicates a potential stock split
+- `hasNulls`: Indicates presence of null or zero values
+
+Integrity flags include:
+- `gap_detected`: Trading day gap detected
+- `split_detected`: Potential stock split detected
+- `null_values`: Missing or zero values detected
+- `stale_data`: Using cached data due to fetch failure
+- `high_below_low`: Invalid data (high price below low)
+- `close_out_of_range`: Invalid data (close outside high/low range)
+- `negative_prices`: Invalid data (negative price values)
+- `zero_price_with_volume`: Invalid data (zero price with non-zero volume)
 
 ## License
 

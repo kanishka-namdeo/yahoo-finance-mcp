@@ -254,3 +254,115 @@ network:
   # Follow HTTP redirects
   # Recommended: true
   followRedirects: true
+
+# Logging configuration
+logging:
+  # Logging level: 'debug', 'info', 'warn', 'error'
+  # Recommended: 'info'
+  level: info
+
+  # Log format: 'json' or 'text'
+  # Recommended: 'json' for production
+  format: json
+
+  # Log destination: 'console', 'file', or 'both'
+  # Recommended: 'console'
+  destination: console
+
+  # Path to log file (when destination includes 'file')
+  filePath: ./logs/mcp-server.log
+
+  # Maximum log file size in bytes (10MB)
+  # Recommended: 5242880-20971520
+  maxSize: 10485760
+
+  # Maximum number of log files to keep
+  # Recommended: 3-10
+  maxFiles: 5
+
+# MCP Server information
+serverInfo:
+  # Server name identifier
+  name: y-finance-mcp-server
+
+  # Server version following semantic versioning
+  version: 1.0.0
+
+  # MCP protocol version supported
+  protocolVersion: 1.0
+
+# MCP Server capabilities
+capabilities:
+  tools:
+    # Tool capabilities
+    listChanged: false
+
+  resources:
+    # Resource capabilities
+    subscribe: false
+    listChanged: false
+
+  prompts:
+    # Prompt capabilities
+    listChanged: false
+
+  logging:
+    # Logging capabilities
+    level: info
+
+# Security configuration
+security:
+  # Enable security features
+  # Recommended: true
+  enabled: true
+
+  # Validate all input parameters
+  # Recommended: true
+  enableInputValidation: true
+
+  # Sanitize output data
+  # Recommended: true
+  enableOutputSanitization: true
+
+  # Maximum symbols per request
+  # Recommended: 50-100
+  maxSymbolsPerRequest: 50
+
+  # Maximum string length for inputs
+  # Recommended: 500-2000
+  maxStringLength: 1000
+
+  # Allowed CORS origins (empty array allows all)
+  allowedOrigins: []
+
+  # Enable rate limiting
+  # Recommended: true
+  enableRateLimiting: true
+
+  # Log all requests for audit
+  # Recommended: true
+  enableRequestLogging: true
+
+  # Sanitize error messages to avoid info leakage
+  # Recommended: true
+  sanitizeErrors: true
+
+  # Maximum requests per IP per window
+  # Recommended: 500-2000
+  maxRequestsPerIP: 1000
+
+  # Rate limit time window in ms (1 hour)
+  # Recommended: 3600000-7200000
+  rateLimitWindowMs: 3600000
+
+  # IP block duration in ms (1 hour)
+  # Recommended: 3600000-7200000
+  blockDurationMs: 3600000
+
+  # Enable CSRF protection
+  # Recommended: true
+  enableCSRFProtection: true
+
+  # Enable CSP headers
+  # Recommended: true
+  enableContentSecurityPolicy: true
