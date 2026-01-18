@@ -80,6 +80,59 @@ Or if running from source:
 }
 ```
 
+### Usage with Other AI Tools
+
+**Cursor AI:**
+
+Add to Cursor's MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "yfnhanced": {
+      "command": "yfnhanced-mcp"
+    }
+  }
+}
+```
+
+**Cline AI:**
+
+Add to Cline's MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "yfnhanced": {
+      "command": "yfnhanced-mcp"
+    }
+  }
+}
+```
+
+**Custom Integration:**
+
+Use the MCP SDK to integrate with any AI assistant:
+
+```typescript
+import { Client } from '@modelcontextprotocol/sdk';
+
+const client = new Client({
+  name: 'your-app',
+  version: '1.0.0',
+});
+
+await client.connect({
+  command: 'yfnhanced-mcp',
+});
+
+// Use financial data tools
+const quote = await client.callTool({
+  name: 'get_quote',
+  arguments: { symbol: 'AAPL' }
+});
+```
+
 ---
 
 ## Documentation
