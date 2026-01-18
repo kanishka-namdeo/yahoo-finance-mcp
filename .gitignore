@@ -84,3 +84,7 @@ Desktop.ini
 *.bak
 *.backup
 .turbo/
+
+# Agent and prompt files
+AGENTS.md
+master-prompt.md
